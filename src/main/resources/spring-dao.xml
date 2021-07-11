@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--这里配置数据源，以及最下面的Mapper扫描以前都是mybatis-config.xml做的，现在要统统交给spring管理-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <bean id="driverManagerDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="username" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+    </bean>
+
+    <!--这里要把mybatis-config.xml托管给spring，为什么要托管，因为项目一启动，spring-dao.xml就会被applicationContext.xml所影响也启动，而
+    spring-dao.xml里又引入了mybatis-config.xml，所以mybatis-config.xml也会被加载，因为有了它，我们是不是就可以产生sqlSession呀-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="driverManagerDataSource"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!--配别名-->
+        <property name="typeAliasesPackage" value="com.cht.pojo"/>
+    </bean>
+
+    <!--扫描dao包下的Mapper接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com/cht/dao/"/>
+    </bean>
+
+
+</beans>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <!--ShiroFilter被注释了，那是因为ShiroFilter已经被Spring接管了，可以看spring-shiro.xml配置文件-->
+  <!--<filter>
+      <filter-name>shiroFilter</filter-name>
+      <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+  </filter>
+  <filter-mapping>
+      <filter-name>shiroFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+  </filter-mapping>-->
+
+    <!--在项目启动时，会加载web-inf下或classpath下的shiro.ini，并构建WebSecurityManager，
+    构建所有配置中使用的过滤器链(anon，authc等)，ShiroFilter会获取此过滤器链-->
+  <!--<listener>
+      <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+  </listener>-->
+    <!--以上EnvironmentLoaderListener注释掉了，那是因为shiro.ini不再需要了，shiro环境已由spring初始化好了-->
+
+
+    
+  <servlet>
+    <servlet-name>dispatcher</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:applicationContext.xml</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>dispatcher</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <!--配置下面监听器的作用是让MyRealm类里的ContextLoader.getCurrentWebApplicationContext()发挥作用-->
+    <!--注意ContextLoaderListener要依赖下面的contextConfigLocation-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:applicationContext.xml</param-value>
+    </context-param>
+
+
+    <!--会从spring工厂中获取和它同名的Bean，（id="shiroFilter"）
+   接到请求后调用bean的doFilter方法，进行访问控制-->
+    <filter>
+        <filter-name>shiroFilter</filter-name>  <!--注意，这行的shiroFilter可不是随便乱写的，看上面的注释说明-->
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class> <!--DelegatingFilterProxy不处理业务，传话的-->
+        <init-param>
+            <param-name>targetFilterLifecycle</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>shiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+</web-app>

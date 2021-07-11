@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+
+    <mappers >
+        <!--配好它，就可以userMapper.queryUserByUsername("xxx");了-->
+        <mapper resource="UserMapper.xml"></mapper>
+        <mapper resource="RoleMapper.xml"></mapper>
+        <mapper resource="PermissionMapper.xml"></mapper>
+    </mappers>
+
+</configuration>
